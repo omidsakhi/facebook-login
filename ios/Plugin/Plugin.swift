@@ -124,10 +124,12 @@ public class FacebookLogin: CAPPlugin {
 
     @objc func logEvent(_ call: CAPPluginCall) {
         if let eventName = call.getString("eventName") {
-            AppEvents.shared.logEvent(AppEvents.Name(eventName))
+            let parameters = call.getObject("parameters") ?? [:]
+            AppEvents.shared.logEvent(AppEvents.Name(eventName), parameters: parameters)
+            call.resolve()
+        } else {
+            call.reject("Event name is required")
         }
-
-        call.resolve()
     }
 
     @objc func setAutoLogAppEventsEnabled(_ call: CAPPluginCall) {

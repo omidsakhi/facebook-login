@@ -305,8 +305,49 @@ public class FacebookLogin extends Plugin {
     public void logEvent(final PluginCall call) {
         Log.d(getLogTag(), "Entering logEvent()");
         String eventName = call.getString("eventName");
+        JSObject parameters = call.getObject("parameters", new JSObject());
+
         if (eventName != null) {
-            logger.logEvent(eventName);
+            Bundle paramsBundle = new Bundle();
+            for (String key : parameters.keys()) {
+                try {
+                    paramsBundle.putString(key, parameters.getString(key));
+                } catch (JSONException e) {
+                    Log.e(getLogTag(), "Error parsing parameters", e);
+                }
+            }
+            logger.logEvent(eventName, paramsBundle);
+            call.resolve();
+        } else {
+            call.reject("Event name is required");
         }
     }
+
+    @PluginMethod
+    public void setAutoLogAppEventsEnabled(final PluginCall call) {
+        Log.d(getLogTag(), "Entering setAutoLogAppEventsEnabled()");
+        Boolean enabled = call.getBoolean("enabled");
+        if (enabled != null) {
+            FacebookSdk.setAutoLogAppEventsEnabled(enabled);
+            Log.d(getLogTag(), "AutoLogAppEventsEnabled set to " + enabled);
+            call.resolve();
+        } else {
+            Log.e(getLogTag(), "setAutoLogAppEventsEnabled: 'enabled' parameter is missing or invalid");
+            call.reject("The 'enabled' parameter is required and must be a boolean.");
+        }
+    }
+
+    @PluginMethod
+    public void setAdvertiserIDCollectionEnabled(final PluginCall call) {
+        Log.d(getLogTag(), "Entering setAdvertiserIDCollectionEnabled()");
+        Boolean enabled = call.getBoolean("enabled");
+        if (enabled != null) {
+            FacebookSdk.setAdvertiserIDCollectionEnabled(enabled);
+            Log.d(getLogTag(), "AdvertiserIDCollectionEnabled set to " + enabled);
+            call.resolve();
+        } else {
+            Log.e(getLogTag(), "setAdvertiserIDCollectionEnabled: 'enabled' parameter is missing or invalid");
+            call.reject("The 'enabled' parameter is required and must be a boolean.");
+        }
+    }    
 }
