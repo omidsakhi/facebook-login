@@ -41,7 +41,7 @@ declare interface Facebook {
     params: TParams,
     callback: (response: TResponse) => void,
   ): void;
-  logEvent(handle: (response: any) => void, options: { eventName: string }): void;
+  logEvent(options: { eventName: string; parameters?: Record<string, string> }): Promise<void>;
   setAutoLogAppEventsEnabled(
     handle: (response: any) => void,
     options: { enabled: boolean },
@@ -179,7 +179,7 @@ export class FacebookLoginWeb extends WebPlugin implements FacebookLoginPlugin {
     });
   }
 
-  async logEvent(): Promise<void> {
+  async logEvent(options: { eventName: string; parameters?: Record<string, string> }): Promise<void> {
     return Promise.resolve();
   }
 
